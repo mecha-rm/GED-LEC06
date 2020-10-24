@@ -33,7 +33,7 @@ public class GameController : MonoBehaviour
     void Start()
     {
         tileManager = FindObjectOfType<TileManager>();
-        // Tiles = new List<GameObject>();
+        Tiles = new List<GameObject>(); // this has been replaced with TileManager.MaxTiles
         _Reset();
     }
 
@@ -45,7 +45,7 @@ public class GameController : MonoBehaviour
 
             if (Tiles.Count <= MaxTiles - 1)
             {
-                var newTile = TileFactory.Instance().CreateTile(new_location);
+                var newTile = tileManager.GetTile(); // TileFactory.Instance().CreateTile(new_location);
                 newTile.transform.position = new_location;
                 Tiles.Add(newTile);
                 m_tilePosition[key] = true;
@@ -57,11 +57,13 @@ public class GameController : MonoBehaviour
         return false;
     }
 
+    // tile size
     public int TileSize()
     {
         return Tiles.Count;
     }
 
+    // update
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.R))
@@ -79,13 +81,16 @@ public class GameController : MonoBehaviour
             _ToggleMiniMap();
         }
 
-        TileCount.text = "Tile Count: " + Tiles.Count.ToString();
+        // TileCount.text = "Tile Count: " + Tiles.Count.ToString();
+        TileCount.text = "Tile Count: " + TileSize().ToString();
     }
 
+    // ThresholdCheck
     IEnumerator ThresholdCheck()
     {
-        yield return new WaitForSeconds(5.0f);
-        if ((float)Tiles.Count < ((float)MaxTiles * Threshold))
+        yield return new WaitForSeconds(10.0f); // originally 5.0F
+        // if ((float)Tiles.Count < ((float)MaxTiles * Threshold))
+        if ((float)Tiles.Count < ((float)tileManager.MaxTiles * Threshold))
         {
             _Reset();
         }
@@ -93,17 +98,21 @@ public class GameController : MonoBehaviour
         _FindFarthestTile();
     }
 
+    // Reset and Regenerate Tiles
     private void _Reset()
     {
-        // if (Tiles.Count > 0)
-        // {
-        //     Tiles.Clear();
-        //     m_tilePosition.Clear();
-        //     foreach (Transform child in transform)
-        //     {
-        //         Destroy(child.gameObject);
-        //     }
-        // }
+        if (Tiles.Count > 0)
+        {
+            Tiles.Clear();
+            m_tilePosition.Clear();
+
+            foreach (Transform child in transform)
+            {
+                tileManager.ReturnTile(child.gameObject);
+
+                // Destroy(child.gameObject); // original function call.
+            }
+        }
 
         player.gameObject.GetComponent<CharacterController>().enabled = false;
         player.transform.position = playerSpawnPoint.position;
@@ -114,6 +123,7 @@ public class GameController : MonoBehaviour
         StartCoroutine(ThresholdCheck());
     }
 
+    // Quit
     private void _Quit()
     {
     #if UNITY_EDITOR
@@ -123,6 +133,7 @@ public class GameController : MonoBehaviour
     #endif
     }
 
+    // Finds the farthest tile
     private void _FindFarthestTile()
     {
         float maxDistance = 0.0f;
@@ -140,6 +151,7 @@ public class GameController : MonoBehaviour
         enemy.transform.position = enemySpawnPoint.transform.position;
     }
 
+    // toggle the mini map
     private void _ToggleMiniMap()
     {
         MiniMap.enabled = !MiniMap.enabled;

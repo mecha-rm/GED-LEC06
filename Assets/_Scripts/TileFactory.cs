@@ -14,6 +14,7 @@ public class TileFactory
         Start();
     }
 
+    // gets instance (singleton)
     public static TileFactory Instance()
     {
         if (m_instance == null)
@@ -24,6 +25,7 @@ public class TileFactory
         return m_instance;
     }
 
+    // creates a tile
     public GameObject CreateTile(Vector3 location = new Vector3())
     {
         var newTile = MonoBehaviour.Instantiate(tile, location, Quaternion.identity);
@@ -32,6 +34,7 @@ public class TileFactory
         return newTile;
     }
 
+    // start function
     void Start()
     {
         tile = Resources.Load("Prefabs/Tile") as GameObject;

@@ -12,7 +12,7 @@ public class TileManager : MonoBehaviour
     public int MaxTiles;
 
     // Start is called before the first frame update
-    void Start() // TODO: replace with Awake?
+    void Awake() // replaced 'Start()' with 'Awake'
     {
         m_TilePool = new Queue<GameObject>();
         _BuildTilePool();
@@ -24,12 +24,13 @@ public class TileManager : MonoBehaviour
         
     }
 
+    // forms the tile pool.
     private void _BuildTilePool()
     {
         // The instantiates itself.
         for(var count = 0; count < MaxTiles; count++)
         {
-            // Enque a new file from the factory
+            // Enque a new Tile from the factory
             var tempTile = TileFactory.Instance().CreateTile();
             tempTile.SetActive(false);
             m_TilePool.Enqueue(tempTile);
@@ -42,7 +43,7 @@ public class TileManager : MonoBehaviour
     /// <returns></returns>
     public GameObject GetTile()
     {
-        Debug.Log(m_TilePool.Count);
+        // Debug.Log(m_TilePool.Count);
 
         // when it's removed from the pool, set it to active.
         var tempTile = m_TilePool.Dequeue();
